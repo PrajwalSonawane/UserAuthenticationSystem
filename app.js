@@ -35,6 +35,11 @@ initializeDnAndServer();
 //npm install bcrypt --save
 // const hashedPassword = await bcrypt.hash(password,saltRounds);
 
+app.get("/", async (request, response) => {
+  response.status(200);
+  response.send(`Welcome to homepage of this API`); 
+});
+
 app.post("/register", async (request, response) => {
   const { username, name, password, gender, location } = request.body;
   //encrypt password
