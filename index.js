@@ -7,8 +7,8 @@ const app = express();
 app.use(express.json());
 
 // Routes
-app.use("/home", home);
+app.use("/", home);
 
 // connection
-const port = process.env.PORT || 9001;
+const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`Listening to port ${port}`));
