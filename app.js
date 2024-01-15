@@ -9,12 +9,13 @@ const app = express();
 app.use(express.json());
 const databasePath = path.join(__dirname, "userData.db");
 let database = null;
+const port = process.env.PORT || 3001;
 
 const initializeDnAndServer = async () => {
   try {
     database = await open({ filename: databasePath, driver: sqlite3.Database });
-    app.listen(3000, () => {
-      console.log(`Server is running on http://localhost:3000`);
+    app.listen(port, () => {
+      console.log(`Server is running on http://localhost:${port}`);
     });
   } catch (error) {
     console.log(`Database Error is ${error}`);
