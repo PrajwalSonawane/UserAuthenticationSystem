@@ -1,55 +1,34 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
-const path = require("path");
-const sqlite3 = require("sqlite3");
-const { open } = require("sqlite");
-const databasePath = path.join(__dirname, "../userData.db");
-console.log(databasePath);
-let database = null;
-const db = require('../db');
-
-const initializeDnAndServer = async () => {
-    try {
-        database = await open({ filename: databasePath, driver: sqlite3.Database });
-    } catch (error) {
-        console.log(`Database Error is ${error}`);
-        process.exit(1);
-    }
-};
-  
-initializeDnAndServer();
+const db = require("../db");
 
 router.get("/", async (req, res, next) => {
   return res.status(200).json({
-    title: "Express Testing",
-    message: "The app is working properly!",
+    title: "Welcome to user Auth API",
+    message: "This message confirms API is working",
   });
 });
 
 router.post("/register", async (request, response) => {
   const { username, name, password, gender, location } = request.body;
-  //encrypt password
   const hashedPassword = await bcrypt.hash(password, 10);
-  // check if user exists
-  //const checkUserQuery = `select username from user where username = '${username}';`;
-  const checkUserResponse = await db.query(`select * from users where username = '${username}'`);
-  //const checkUserResponse = await database.get(checkUserQuery);
-  console.log(checkUserResponse.rows);
+  const checkUserResponse = await db.query(
+    `select * from users where username = '${username}'`
+  );
   if (checkUserResponse.rows.length == 0) {
-    const createUserQuery = `
-      insert into users(username,name,password,gender,location) 
+    const createUserQuery = `insert into users(username, name, password, gender, location) 
       values('${username}','${name}','${hashedPassword}','${gender}','${location}')`;
     if (password.length > 5) {
       const createUser = await db.query(createUserQuery);
-      response.send("User created successfully"); //Scenario 3
+      response.send("User created successfully");
     } else {
       response.status(400);
-      response.send("Password is too short"); //Scenario 2
+      response.send("Password is too short");
     }
   } else {
     response.status(400);
-    response.send(`User already exists`); //Scenario 1
+    response.send(`User already exists`);
   }
 });
 
@@ -57,7 +36,6 @@ router.post("/login", async (request, response) => {
   const { username, password } = request.body;
   const checkUserQuery = `select * from users where username = '${username}'`;
   const userNameResponse = await db.query(checkUserQuery);
-  console.log(userNameResponse.rows);
   if (userNameResponse.rows.length > 0) {
     const isPasswordMatched = await bcrypt.compare(
       password,
@@ -65,14 +43,14 @@ router.post("/login", async (request, response) => {
     );
     if (isPasswordMatched) {
       response.status(200);
-      response.send(`Login success!`); // Scenario 3
+      response.send(`Login success!`);
     } else {
       response.status(400);
-      response.send(`Invalid password`); // Scenario 2
+      response.send(`Invalid password`);
     }
   } else {
     response.status(400);
-    response.send(`Invalid user`); //Scenario 1
+    response.send(`Invalid user`);
   }
 });
 
@@ -92,25 +70,26 @@ router.put("/change-password", async (request, response) => {
         password = '${hashedPassword}' where username = '${username}';`;
         const updatePasswordResponse = await db.query(updatePasswordQuery);
         response.status(200);
-        response.send("Password updated"); //Scenario 3
+        response.send("Password updated");
       } else {
         response.status(400);
-        response.send("Password is too short"); //Scenario 2
+        response.send("Password is too short");
       }
     } else {
       response.status(400);
-      response.send("Invalid current password"); //Scenario 1
+      response.send("Invalid current password");
     }
   } else {
     response.status(400);
-    response.send(`Invalid user`); // Scenario 4
+    response.send(`Invalid user`);
   }
 });
 
 router.get("/message-list", async (request, response) => {
-  const messageList = await db.query('select message from users where message IS NOT NULL');
+  const messageList = await db.query(
+    "select message from users where message IS NOT NULL"
+  );
   return response.status(200).json(messageList.rows);
 });
-
 
 module.exports = router;
