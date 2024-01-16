@@ -50,16 +50,19 @@ router.post("/login", async (request, response) => {
     );
     if (isPasswordMatched) {
       return response.status(200).json({
-        status: "success"
+        status: "success",
+        name: userNameResponse.rows[0].name
       });
     } else {
       return response.status(200).json({
-        status: "failure"
+        status: "failure",
+        name: ''
       });
     }
   } else {
     return response.status(200).json({
-      status: "failure"
+      status: "failure",
+      name: ''
     });
   }
 });
