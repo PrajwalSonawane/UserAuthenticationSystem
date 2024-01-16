@@ -109,6 +109,7 @@ router.get("/message-list", async (request, response) => {
   );
   return response.status(200).json(messageList.rows);
 });
+
 router.post("/message", async (request, response) => {
   const { username, message } = request.body;
   const setMessageQuery = `update users set 
@@ -117,6 +118,23 @@ router.post("/message", async (request, response) => {
   return response.status(200).json({
     status: "success"
   });
+});
+
+router.post("/checkmessage", async (request, response) => {
+  const { username } = request.body;
+  const setMessageQuery =  `select * from users where username = '${username}'`;
+  const dbResponse = await db.query(setMessageQuery);
+  if (dbResponse.rows.length > 0) {
+    return response.status(200).json({
+      status: "success",
+      message: dbResponse.rows[0].message
+    });
+  } else {
+    return response.status(200).json({
+      status: "failure",
+      message: "username does not exist"
+    });
+  }
 });
 
 module.exports = router;
