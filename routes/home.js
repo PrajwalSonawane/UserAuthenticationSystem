@@ -109,5 +109,14 @@ router.get("/message-list", async (request, response) => {
   );
   return response.status(200).json(messageList.rows);
 });
+router.post("/message", async (request, response) => {
+  const { username, message } = request.body;
+  const setMessageQuery = `update users set 
+  message = '${message}' where username = '${username}';`;
+  const dbResponse = await db.query(setMessageQuery);
+  return response.status(200).json({
+    status: "success"
+  });
+});
 
 module.exports = router;
