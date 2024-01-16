@@ -21,14 +21,21 @@ router.post("/register", async (request, response) => {
       values('${username}','${name}','${hashedPassword}','${gender}','${location}')`;
     if (password.length > 5) {
       const createUser = await db.query(createUserQuery);
-      response.send("User created successfully");
+      return response.status(200).json({
+        message: "User created successfully",
+        statusCode: 1
+      });
     } else {
-      response.status(400);
-      response.send("Password is too short");
+      return response.status(200).json({
+        message: "Password is too short",
+        statusCode: 0
+      });
     }
   } else {
-    response.status(400);
-    response.send(`User already exists`);
+    return response.status(200).json({
+      message: "User with this ID already exists!",
+      statusCode: 0
+    });
   }
 });
 
@@ -42,15 +49,18 @@ router.post("/login", async (request, response) => {
       userNameResponse.rows[0].password
     );
     if (isPasswordMatched) {
-      response.status(200);
-      response.send(`Login success!`);
+      return response.status(200).json({
+        status: "success"
+      });
     } else {
-      response.status(400);
-      response.send(`Invalid password`);
+      return response.status(200).json({
+        status: "failure"
+      });
     }
   } else {
-    response.status(400);
-    response.send(`Invalid user`);
+    return response.status(200).json({
+      status: "failure"
+    });
   }
 });
 
@@ -69,19 +79,27 @@ router.put("/change-password", async (request, response) => {
         const updatePasswordQuery = `update users set 
         password = '${hashedPassword}' where username = '${username}';`;
         const updatePasswordResponse = await db.query(updatePasswordQuery);
-        response.status(200);
-        response.send("Password updated");
+        return response.status(200).json({
+          message: "Password updated",
+          statusCode: 1
+        });
       } else {
-        response.status(400);
-        response.send("Password is too short");
+        return response.status(200).json({
+          message: "Password is too short",
+          statusCode: 0
+        });
       }
     } else {
-      response.status(400);
-      response.send("Invalid current password");
+      return response.status(200).json({
+        message: "Invalid current password",
+        statusCode: 0
+      });
     }
   } else {
-    response.status(400);
-    response.send(`Invalid user`);
+    return response.status(200).json({
+      message: "Invalid user",
+      statusCode: 0
+    });
   }
 });
 
